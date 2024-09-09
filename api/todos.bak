@@ -1,27 +1,12 @@
 const express = require('express');
 const fs = require('fs');
 const todos = express.Router()
-const { MongoClient } = require('mongodb');
-
-
-const url = 'mongodb+srv://hanjoo:9HdPaNAplx7KmMtf@hanjoo.wxhmb.mongodb.net/?retryWrites=true&w=majority&appName=hanjoo';
-const client = new MongoClient(url);
-
-const dbName = 'todos';
-
 
 
 let data = fs.readFileSync('./dataBase/data.json');
 let dataParse = JSON.parse(data);
 
-todos.get('/', async function (req, res) {
-
-    await client.connect();
-    // 커ㅏ넥트 안되면 아래꺼 실행 안됨. 
-    console.log('Connected successfully to server');
-    const db = client.db(dbName);
-    const collection = db.collection('data');
-
+todos.get('/', function (req, res) {
   res.send( dataParse )
 })
 todos.get('/:id', function (req, res) {
