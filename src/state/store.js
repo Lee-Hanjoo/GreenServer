@@ -26,7 +26,11 @@ const store = create((set) => ({
         case 'delete' : 
         res = await instance.delete(`/?id=${action.data}`); break;
     }    
-    set({data:res.data});   
+    // set({data:res.data});   
+    
+    set( (state)=> {
+      return {data:[...state.data, ...res.data]};
+    });   
     
   },
   sortCtrl : function(sort){
