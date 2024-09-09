@@ -10,8 +10,6 @@ const store = create((set) => ({
   sortData :[],
   dataCtrl : async function(action){
 
-    
-
     let res;    
     switch(action.type){
         case 'get' : 
@@ -29,7 +27,7 @@ const store = create((set) => ({
         case 'put' : 
             await instance.put("/",action.data); 
             set( (state)=> {
-              let update = state.data.map((obj)=>{
+              let update = [...state.data].map((obj)=>{
                             if(action.data.id == obj.id){
                               obj.status = action.status
                             }
@@ -40,10 +38,16 @@ const store = create((set) => ({
             break;
 
         case 'delete' : 
-        res = await instance.delete(`/?id=${action.data}`); break;
+            res = await instance.delete(`/?id=${action.data}`); 
+            set( (state)=> {
+              let del = [...state.data].filter((obj)=>{
+                            return obj.id != action.data                          
+                          })
+                          console.log(del)
+              return {data:del};
+            });  
+            break;
     }    
-    // set({data:res.data});   
-     
     
   },
   sortCtrl : function(sort){
