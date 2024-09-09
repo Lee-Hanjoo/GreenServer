@@ -1,10 +1,8 @@
 import axios from 'axios';
 import { create } from 'zustand';
 
-
 const instance = axios.create({
-  //정보 숨기려고 이렇게 하는거임 
-    baseURL: process.env.REACT_APP_SERVER_URL
+    baseURL: process.env.REACT_APP_SERVER_URL,
 });
 
 const store = create((set) => ({
@@ -12,25 +10,39 @@ const store = create((set) => ({
   sortData :[],
   dataCtrl : async function(action){
 
+    
+
     let res;    
     switch(action.type){
         case 'get' : 
-        res = await instance.get("/"); break;
+        res = await instance.get("/");
+        set({data:res.data});  
+        break;
 
         case 'post' : 
-        res = await instance.post("/",action.data); break;
+        set( (state)=> {
+          return {data:[...state.data, action.data]};
+        });  
+        await instance.post("/",action.data);
+        break;
 
         case 'put' : 
-        res = await instance.put("/",action.data); break;
+        set( (state)=> {
+          let update = state.data.map((obj)=>{
+                        if(action.data.id == obj.id){
+                          obj.status = action.status
+                        }
+                        return obj;
+                      })
+          return {data:update};
+        });  
+        await instance.put("/",action.data); break;
 
         case 'delete' : 
         res = await instance.delete(`/?id=${action.data}`); break;
     }    
     // set({data:res.data});   
-    
-    set( (state)=> {
-      return {data:[...state.data, ...res.data]};
-    });   
+     
     
   },
   sortCtrl : function(sort){
