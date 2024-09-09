@@ -1,69 +1,75 @@
 const express = require('express');
-const fs = require('fs');
 const todos = express.Router()
 const { MongoClient } = require('mongodb');
 
-
-const url = 'mongodb+srv://hanjoo:9HdPaNAplx7KmMtf@hanjoo.wxhmb.mongodb.net/?retryWrites=true&w=majority&appName=hanjoo';
-const client = new MongoClient(url);
 const dbName = 'todos';
+const url = 'mongodb+srv://hanjoo:abcd1234@hanjoo.wxhmb.mongodb.net/?retryWrites=true&w=majority&appName=hanjoo';
+// const url = 'mongodb+srv://minkyu:abcdef2397@minkyu.rlol7cf.mongodb.net/?retryWrites=true&w=majority&appName=minkyu';
 
-async function main(){
+const client = new MongoClient(url);
+
+async function connect(){
     await client.connect();
-    // 커ㅏ넥트 안되면 아래꺼 실행 안됨. 
-    console.log('Connected successfully to server');
     const db = client.db(dbName);
-    const collection = db.collection('data');
 
-    return collection
+    return db.collection('data');
 }
 
-let data = fs.readFileSync('./dataBase/data.json');
-let dataParse = JSON.parse(data);
-
 todos.get('/', async function (req, res) {
-
-    const collection = await main();
-
+    const collection = await connect();   
     const findResult = await collection.find({}).toArray();
-    client.close(); // 디비끝낸다.
+    client.close();
 
-  res.send( findResult )
+    res.send( findResult )
 })
-todos.get('/:id', function (req, res) {
-    let {id} = req.params;
-    let d = dataParse.list.filter((obj)=>obj.id == id);
+todos.get('/:id', async function (req, res) {
+    let id = req.params;
 
-    res.send(d)
-})
+    const collection = await connect();   
+    const findResult = await collection.find(id).toArray();
+    client.close();
 
-todos.post('/', function (req, res) {
-    let body = [...dataParse.list, req.body];
-    fs.writeFileSync('./dataBase/data.json',JSON.stringify({list:body}))
-    res.send({list:body})
+    res.send( findResult )
 })
 
+todos.post('/', async function (req, res) {
+    // let body = [...dataParse.list, req.body];
+    // fs.writeFileSync('./dataBase/data.json',JSON.stringify({list:body}))
+    // res.send({list:body})
 
-todos.put('/', function (req, res) {
-    let {id,status} = req.body;  
+    const collection = await connect();
+                        await collection.insertOne(req.body);
+    const findResult = await collection.find({}).toArray();
+    client.close();
 
-    let body = [...dataParse.list].map(obj=>{
-        if(obj.id == id){
-            obj.status = status;
-        }
-        return obj;
-    })
-
-    fs.writeFileSync('./dataBase/data.json',JSON.stringify({list:body}))
-    res.send({list:body})
+    res.send( findResult )
 })
 
-todos.delete('/', function (req, res) {
-    let {id} = req.query;    
-    let body = [...dataParse.list].filter(obj=>obj.id != id);
 
-    fs.writeFileSync('./dataBase/data.json',JSON.stringify({list:body}))
-    res.send({list:body})
+todos.put('/', async function (req, res) {
+
+    const collection = await connect();
+                                                    // {찾는놈},{바꿀값}
+                        await collection.updateOne({id:req.body.id},{$set:req.body});
+    const findResult = await collection.find({}).toArray();
+    client.close();
+
+    res.send( findResult )
+
+})
+
+todos.delete('/', async function (req, res) {
+    // let body = [...dataParse.list].filter(obj=>obj.id != id);
+
+    // fs.writeFileSync('./dataBase/data.json',JSON.stringify({list:body}))
+    
+
+    const collection = await connect();
+                        await collection.deleteOne(req.query);
+    const findResult = await collection.find({}).toArray();
+    client.close();
+
+    res.send( findResult )
 })
 
 module.exports = todos;
