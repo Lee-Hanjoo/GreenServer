@@ -20,23 +20,24 @@ const store = create((set) => ({
         break;
 
         case 'post' : 
-        set( (state)=> {
-          return {data:[...state.data, action.data]};
-        });  
-        await instance.post("/",action.data);
-        break;
+            await instance.post("/",action.data);
+            set( (state)=> {
+              return {data:[...state.data, action.data]};
+            });  
+            break;
 
         case 'put' : 
-        set( (state)=> {
-          let update = state.data.map((obj)=>{
-                        if(action.data.id == obj.id){
-                          obj.status = action.status
-                        }
-                        return obj;
-                      })
-          return {data:update};
-        });  
-        await instance.put("/",action.data); break;
+            await instance.put("/",action.data); 
+            set( (state)=> {
+              let update = state.data.map((obj)=>{
+                            if(action.data.id == obj.id){
+                              obj.status = action.status
+                            }
+                            return obj;
+                          })
+              return {data:update};
+            });  
+            break;
 
         case 'delete' : 
         res = await instance.delete(`/?id=${action.data}`); break;
