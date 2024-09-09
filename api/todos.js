@@ -18,17 +18,15 @@ async function main(){
     return collection
 }
 
-main()
-.then(res => {
-    console.log(res);
-})
-
-
 let data = fs.readFileSync('./dataBase/data.json');
 let dataParse = JSON.parse(data);
 
 todos.get('/', async function (req, res) {
+
+    const collection = await main();
+
     const findResult = await collection.find({}).toArray();
+    client.close(); // 디비끝낸다.
 
   res.send( findResult )
 })
