@@ -29,7 +29,7 @@ const store = create((set) => ({
             set( (state)=> {
               let update = [...state.data].map((obj)=>{
                             if(action.data.id == obj.id){
-                              obj.status = action.status
+                              obj.status = action.data.status
                             }
                             return obj;
                           })
@@ -43,7 +43,6 @@ const store = create((set) => ({
               let del = [...state.data].filter((obj)=>{
                             return obj.id != action.data                          
                           })
-                          console.log(del)
               return {data:del};
             });  
             break;

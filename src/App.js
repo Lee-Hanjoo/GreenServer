@@ -13,9 +13,11 @@ function App() {
     <div className='todolist'>
       <h2>todos</h2>
       <div className='wrap'>
-        <Insert/>
-        <List/>
-        <Sort/>
+        
+          <Insert/>
+          <List/>
+          <Sort/>
+        
       </div>
     </div>
   );
